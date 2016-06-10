@@ -1,14 +1,21 @@
-#!/Bin/Bash
+#!/bin/bash
 
 #initial setup
-cd ~
-git clone https://github.com/SchedMD/slurm
-cd slurm
+mkdir /vagrant/source
+cd /vagrant/source
 
-#initial make lines
+#get slurm
+
+if [ ! -d /vagrant/source/slurm ]; then 
+    git clone https://github.com/SchedMD/slurm
+    cd slurm
+else 
+    cd slurm
+    git pull
+fi
+
+#build and install slurm
+
 ./configure
 make
 sudo make install
-
-#config lines
-
