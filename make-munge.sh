@@ -6,7 +6,7 @@ cd /vagrant/source
 
 #get munge
 
-if [ ! -d /vagrant/source/slurm ]; then 
+if [ ! -d /vagrant/source/munge ]; then 
     git clone https://github.com/dun/munge
     cd munge
 else 
@@ -16,6 +16,9 @@ fi
 
 #build and install munge
 
+git checkout munge-0.5.12
+
+make clean
 ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var
 make
 sudo make install
