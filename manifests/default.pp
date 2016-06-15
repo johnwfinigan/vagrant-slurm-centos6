@@ -52,14 +52,14 @@ file {
 exec { 'munge_script':
     command => "/bin/bash -c '/vagrant/make-munge.sh'",
     notify => Exec['slurm_script'],
-} ->
+}/* ->
 file { '/etc/munge/munge.key':
     ensure => present,
     source => 'file:///vagrant/keys/munge.key',
     owner => 'munge',
     group => 'munge',
     mode => 400,
-}/* -> 
+} -> 
 service { 'munge':
     ensure => 'running',
     enable => 'true',
