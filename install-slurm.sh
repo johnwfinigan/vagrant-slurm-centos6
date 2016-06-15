@@ -8,4 +8,4 @@ sudo make install
 #move config file and slurm setup
 
 idconfig -n /usr/lib
-cp /vagrant/slurm.conf /etc/slurm.conf
+cp /vagrant/slurm.conf /usr/local/etc/slurm.conf
