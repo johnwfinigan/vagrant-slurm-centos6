@@ -43,26 +43,26 @@ package { ['openssl-devel', 'zlib-devel', 'bzip2-devel']:
 file {
     '/vagrant/make-munge.sh':
     ensure => 'file',
-    path => '/',
+    path => '/vagrant/make-munge.sh',
     owner => 'root',
     group => 'root',
     mode  => '0755',
-    notify => Exec['extract_editor_script'],
+    notify => Exec['muge_script'],
 }
-exec { 'extract_editor_script':
+exec { 'muge_script':
     command => "/bin/bash -c '/vagrant/make-munge.sh'",
-} ->#ensure munge was installed
+} ->
 file { '/etc/munge/munge.key':
     ensure => present,
     source => 'file:///vagrant/keys/munge.key',
     owner => 'munge',
     group => 'munge',
     mode => 400,
-} -> 
+}/* -> 
 service { 'munge':
     ensure => 'running',
     enable => 'true',
-}
+}*/
 
 package { ['perl-ExtUtils-MakeMaker', 'readline-devel', 'pam-devel']:
     ensure => 'installed',
@@ -126,16 +126,16 @@ file { '/var/log/slurm_jobcomp.log':
 file {
     '/vagrant/make-slurm.sh':
     ensure => 'file',
-    path => '/',
+    path => '/vagrant/make-slurm.sh',
     owner => 'root',
     group => 'root',
     mode  => '0755',
-    notify => Exec['extract_editor_script'],
+    notify => Exec['slurm_script'],
 }
-exec { 'extract_editor_script':
+exec { 'slurm_script':
     command => "/bin/bash -c '/vagrant/make-slurm.sh'",
-} ->#ensure slurm was installed
+}/* ->
 service { 'slurm':
     ensure => 'running',
     enable => 'true',
-}
+}*/
