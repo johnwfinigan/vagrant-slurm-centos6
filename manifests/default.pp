@@ -43,7 +43,10 @@ package { ['openssl-devel', 'zlib-devel', 'bzip2-devel']:
 file {
     '/vagrant/make-munge.sh':
     ensure => 'file',
-    path => '/vagrant/make-munge.sh',
+    path => $::hostname?{
+       'head' => '/vagrant/make-munge.sh',
+       default => '/vagrant/install-munge.sh',
+    },
     owner => 'root',
     group => 'root',
     mode  => '0755',
@@ -127,7 +130,10 @@ file { '/var/log/slurm_jobcomp.log':
 file {
     '/vagrant/make-slurm.sh':
     ensure => 'file',
-    path => '/vagrant/make-slurm.sh',
+    path => $::hostname?{
+       'head' => '/vagrant/make-slurm.sh',
+       default => '/vagrant/install-slurm.sh',
+    },
     owner => 'root',
     group => 'root',
     mode  => '0755',
