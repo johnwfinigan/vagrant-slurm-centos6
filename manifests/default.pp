@@ -47,10 +47,11 @@ file {
     owner => 'root',
     group => 'root',
     mode  => '0755',
-    notify => Exec['muge_script'],
+    notify => Exec['munge_script'],
 }
-exec { 'muge_script':
+exec { 'munge_script':
     command => "/bin/bash -c '/vagrant/make-munge.sh'",
+    notify => Exec['slurm_script'],
 } ->
 file { '/etc/munge/munge.key':
     ensure => present,
