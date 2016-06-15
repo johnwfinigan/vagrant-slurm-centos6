@@ -36,25 +36,22 @@ host { 'node2':
     ip => '192.168.2.102',
 }
 
+#Munge setup
 package { ['openssl-devel', 'zlib-devel', 'bzip2-devel']:
     ensure => installed,
 } ->
-package { 'munge':
-    provider => 'rpm',
-    source => 'file:///vagrant/MUNGE/munge-0.5.11-1.el6.x86_64.rpm',
-    ensure => 'installed',
-    install_options => ['--nodeps'],
-} ->
-package { 'munge-libs':
-    provider => 'rpm',
-    source => 'file:///vagrant/MUNGE/munge-libs-0.5.11-1.el6.x86_64.rpm',
-    ensure => 'installed',
-} ->
-package { 'munge-devel':
-    provider => 'rpm',
-    source => 'file:///vagrant/MUNGE/munge-devel-0.5.11-1.el6.x86_64.rpm', 
-    ensure => 'installed',
-} ->
+file {
+    '/vagrant/make-munge.sh':
+    ensure => 'file',
+    path => '/',
+    owner => 'root',
+    group => 'root',
+    mode  => '0755',
+    notify => Exec['extract_editor_script'],
+}
+exec { 'extract_editor_script':
+    command => "/bin/bash -c '/vagrant/make-munge.sh'",
+} ->#ensure munge was installed
 file { '/etc/munge/munge.key':
     ensure => present,
     source => 'file:///vagrant/keys/munge.key',
@@ -65,8 +62,7 @@ file { '/etc/munge/munge.key':
 service { 'munge':
     ensure => 'running',
     enable => 'true',
-} 
-
+}
 
 package { ['perl-ExtUtils-MakeMaker', 'readline-devel', 'pam-devel']:
     ensure => 'installed',
@@ -114,16 +110,32 @@ file { '/var/run/slurm':
     group => 'slurm',
     mode => 755,
 }
-
+#Slurm setup
 file { '/var/log/slurm_jobacct.log':
     ensure => 'present',
     owner => 'slurm',
     group => 'slurm',
     mode => 644,
-}
+}->
 file { '/var/log/slurm_jobcomp.log':
     ensure => 'present',
     owner => 'slurm',
     group => 'slurm',
     mode => 644,
+}->
+file {
+    '/vagrant/make-slurm.sh':
+    ensure => 'file',
+    path => '/',
+    owner => 'root',
+    group => 'root',
+    mode  => '0755',
+    notify => Exec['extract_editor_script'],
+}
+exec { 'extract_editor_script':
+    command => "/bin/bash -c '/vagrant/make-slurm.sh'",
+} ->#ensure slurm was installed
+service { 'slurm':
+    ensure => 'running',
+    enable => 'true',
 }
