@@ -1,26 +1,17 @@
 #!/bin/bash
 
 #initial setup
-mkdir /vagrant/source
-cd /vagrant/source
-
-#get slurm
-
-if [ ! -d /vagrant/source/slurm ]; then 
-    git clone https://github.com/SchedMD/slurm
-    cd slurm
-else 
-    cd slurm
-    git pull
+if [ hostname = "head" ]; 
+then	
+	cd /vagrant/RPMS/x86_64/head
+else
+	cd /vagrant/RPMS/x86_64/node
 fi
 
-#build and install slurm
-
-./configure
-make
-sudo make install
+#Install slurm
+sudo rpm -i slurm*.rpm
 
 #move config file and slurm setup
 
-idconfig -n /usr/lib
-cp /vagrant/slurm.conf /usr/local/etc/slurm.conf
+ldconfig -n /usr/lib
+sudo cp /vagrant/slurm.conf /etc/slurm/slurm.conf

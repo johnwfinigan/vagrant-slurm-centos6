@@ -37,9 +37,9 @@ host { 'node2':
 }
 
 #Munge setup
-#package { ['openssl-devel', 'zlib-devel', 'bzip2-devel']:
-#    ensure => installed,
-#} ->
+package { ['openssl-devel', 'zlib-devel', 'bzip2-devel', 'chrpath']:
+    ensure => installed,
+} ->
 
 
 
@@ -127,10 +127,11 @@ file { '/var/log/slurm_jobcomp.log':
 file {
     '/vagrant/make-slurm.sh':
     ensure => 'file',
-    path => $::hostname?{
-       'head' => '/vagrant/make-slurm.sh',
-       default => '/vagrant/install-slurm.sh',
-    },
+  #  path => $::hostname?{
+    path => '/vagrant/make-slurm.sh',
+ #      'head' => '/vagrant/make-slurm.sh',
+ #      default => '/vagrant/install-slurm.sh',
+#    },
     owner => 'root',
     group => 'root',
     mode  => '0755',
