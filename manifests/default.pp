@@ -139,8 +139,16 @@ file {
 }
 exec { 'slurm_script':
     command => "/bin/bash -c '/vagrant/make-slurm.sh'",
-}/* ->
+}->
 service { 'slurm':
+    ensure => 'running',
+    enable => 'true',
+}/*->
+service { 'daemons':
+    name => $::hostname?{
+       'head' => 'slurmctld',
+       default =? 'slurmd',
+    },
     ensure => 'running',
     enable => 'true',
 }*/

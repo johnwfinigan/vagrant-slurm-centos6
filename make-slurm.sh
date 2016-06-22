@@ -2,11 +2,14 @@
 
 #initial setup
 
+cd /vagrant/RPMS/overlap
+sudo rpm -i slurm*.rpm
+
 if [ hostname = "head" ]; 
 then	
-	cd /vagrant/RPMS/x86_64/head
+	cd /vagrant/RPMS/head
 else
-	cd /vagrant/RPMS/x86_64/node
+	cd /vagrant/RPMS/node
 fi
 
 #Install slurm
@@ -18,10 +21,3 @@ sudo rpm -i slurm*.rpm
 ldconfig -n /usr/lib
 sudo cp /vagrant/slurm.conf /etc/slurm/slurm.conf
 
-#start the daemons
-if [ hostname = "head"];
-then
-	sudo /# /etc/rc.d/init.d/slurmctld start
-else
-	sudo /# /etc/rc.d/init.d/slurmd start
-fi
