@@ -37,25 +37,21 @@ host { 'node2':
 }
 
 #Munge setup
-package { ['openssl-devel', 'zlib-devel', 'bzip2-devel']:
-    ensure => installed,
+#package { ['openssl-devel', 'zlib-devel', 'bzip2-devel']:
+#    ensure => installed,
+#} ->
+
+
+
+package { 'epel':
+	provider => 'rpm',
+	ensure => 'installed',
+	source => 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm',
 } ->
-file {
-    '/vagrant/make-munge.sh':
-    ensure => 'file',
-    path => $::hostname?{
-       'head' => '/vagrant/make-munge.sh',
-       default => '/vagrant/install-munge.sh',
-    },
-    owner => 'root',
-    group => 'root',
-    mode  => '0755',
-    notify => Exec['munge_script'],
-}
-exec { 'munge_script':
-    command => "/bin/bash -c '/vagrant/make-munge.sh'",
-    notify => Exec['slurm_script'],
-}/* ->
+package { ['munge', 'munge-devel', 'munge-libs']:
+	ensure => 'installed',
+        notify => Exec['slurm_script'],
+} ->
 file { '/etc/munge/munge.key':
     ensure => present,
     source => 'file:///vagrant/keys/munge.key',
@@ -66,7 +62,8 @@ file { '/etc/munge/munge.key':
 service { 'munge':
     ensure => 'running',
     enable => 'true',
-}*/
+}
+
 
 package { ['perl-ExtUtils-MakeMaker', 'readline-devel', 'pam-devel']:
     ensure => 'installed',
