@@ -5,7 +5,7 @@
 cd /vagrant/RPMS/overlap
 sudo rpm -i slurm*.rpm
 
-if [ hostname = "head" ]; 
+if [[ $(hostname -s) = "head" ]] ; 
 then	
 	cd /vagrant/RPMS/head
 else

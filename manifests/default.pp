@@ -124,6 +124,18 @@ file { '/var/log/slurm_jobcomp.log':
     group => 'slurm',
     mode => 644,
 }->
+file { '/var/log/slurmctld.log':
+    ensure => 'present',
+    owner => 'slurm',
+    group => 'slurm',
+    mode => 644,
+}->
+file { '/var/log/slurmd.log':
+    ensure => 'present',
+    owner => 'slurm',
+    group => 'slurm',
+    mode => 644,
+}->
 file {
     '/vagrant/make-slurm.sh':
     ensure => 'file',
