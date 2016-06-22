@@ -36,24 +36,21 @@ host { 'node2':
     ip => '192.168.2.102',
 }
 
-package { ['openssl-devel', 'zlib-devel', 'bzip2-devel']:
-    ensure => installed,
+#Munge setup
+#package { ['openssl-devel', 'zlib-devel', 'bzip2-devel']:
+#    ensure => installed,
+#} ->
+
+
+
+package { 'epel':
+	provider => 'rpm',
+	ensure => 'installed',
+	source => 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm',
 } ->
-package { 'munge':
-    provider => 'rpm',
-    source => 'file:///vagrant/MUNGE/munge-0.5.11-1.el6.x86_64.rpm',
-    ensure => 'installed',
-    install_options => ['--nodeps'],
-} ->
-package { 'munge-libs':
-    provider => 'rpm',
-    source => 'file:///vagrant/MUNGE/munge-libs-0.5.11-1.el6.x86_64.rpm',
-    ensure => 'installed',
-} ->
-package { 'munge-devel':
-    provider => 'rpm',
-    source => 'file:///vagrant/MUNGE/munge-devel-0.5.11-1.el6.x86_64.rpm', 
-    ensure => 'installed',
+package { ['munge', 'munge-devel', 'munge-libs']:
+	ensure => 'installed',
+        notify => Exec['slurm_script'],
 } ->
 file { '/etc/munge/munge.key':
     ensure => present,
@@ -65,7 +62,7 @@ file { '/etc/munge/munge.key':
 service { 'munge':
     ensure => 'running',
     enable => 'true',
-} 
+}
 
 
 package { ['perl-ExtUtils-MakeMaker', 'readline-devel', 'pam-devel']:
@@ -114,16 +111,35 @@ file { '/var/run/slurm':
     group => 'slurm',
     mode => 755,
 }
-
+#Slurm setup
 file { '/var/log/slurm_jobacct.log':
     ensure => 'present',
     owner => 'slurm',
     group => 'slurm',
     mode => 644,
-}
+}->
 file { '/var/log/slurm_jobcomp.log':
     ensure => 'present',
     owner => 'slurm',
     group => 'slurm',
     mode => 644,
+}->
+file {
+    '/vagrant/make-slurm.sh':
+    ensure => 'file',
+    path => $::hostname?{
+       'head' => '/vagrant/make-slurm.sh',
+       default => '/vagrant/install-slurm.sh',
+    },
+    owner => 'root',
+    group => 'root',
+    mode  => '0755',
+    notify => Exec['slurm_script'],
 }
+exec { 'slurm_script':
+    command => "/bin/bash -c '/vagrant/make-slurm.sh'",
+}/* ->
+service { 'slurm':
+    ensure => 'running',
+    enable => 'true',
+}*/
