@@ -1,13 +1,3 @@
-group { 'slurm':
-    ensure => 'present',
-    gid => 3000,
-} ->
-user { 'slurm':
-    ensure => 'present',
-    uid => 3000,
-    gid => 3000,
-    managehome => 'true',
-}
 
 file { '/home/vagrant/.ssh/id_rsa':
     mode => 600,
@@ -36,21 +26,16 @@ host { 'node2':
     ip => '192.168.2.102',
 }
 
-#Munge setup
 package { ['openssl-devel', 'zlib-devel', 'bzip2-devel', 'chrpath']:
     ensure => installed,
 } ->
-
-
-
-package { 'epel':
+package { 'epel-release-6-8.noarch':
 	provider => 'rpm',
 	ensure => 'installed',
-	source => 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm',
+	source => 'https://dl.fedoraproject.org/pub/epel/epel-release-6-8.noarch.rpm',
 } ->
 package { ['munge', 'munge-devel', 'munge-libs']:
 	ensure => 'installed',
-        notify => Exec['slurm_script'],
 } ->
 file { '/etc/munge/munge.key':
     ensure => present,
@@ -62,56 +47,38 @@ file { '/etc/munge/munge.key':
 service { 'munge':
     ensure => 'running',
     enable => 'true',
-}
-
-
-package { ['perl-ExtUtils-MakeMaker', 'readline-devel', 'pam-devel']:
+} ->
+package { ['perl-DBI', 'perl-ExtUtils-MakeMaker', 'readline-devel', 'pam-devel']:
     ensure => 'installed',
-}
-
+} ->
+group { 'slurm':
+    ensure => 'present',
+    gid => 3000,
+} ->
+user { 'slurm':
+    ensure => 'present',
+    uid => 3000,
+    gid => 3000,
+    managehome => 'true',
+} ->
 file { '/var/spool/slurmd':
     ensure => 'directory',
     owner => 'slurm',
     group => 'slurm',
     mode => 755,
-}
+} ->
 file { '/var/spool/slurmctld':
     ensure => 'directory',
     owner => 'slurm',
     group => 'slurm',
     mode => 755,
-}
-
-file { '/opt/slurm':
-    ensure => 'directory',
-    owner => 'slurm',
-    group => 'slurm',
-    mode => 755,
 } ->
-file { '/opt/slurm/etc':
-    ensure => 'directory',
-    owner => 'slurm',
-    group => 'slurm',
-    mode => 755,
-} ->
-file { '/opt/slurm/etc/slurm.conf':
-    ensure => present,
-    source => 'file:///vagrant/slurm.conf',
-    owner => 'slurm',
-    group => 'slurm',
-    mode => 644,
-} 
-
-
-
-
 file { '/var/run/slurm':
     ensure => 'directory',
     owner => 'slurm',
     group => 'slurm',
     mode => 755,
-}
-#Slurm setup
+} ->
 file { '/var/log/slurm_jobacct.log':
     ensure => 'present',
     owner => 'slurm',
@@ -136,31 +103,17 @@ file { '/var/log/slurmd.log':
     group => 'slurm',
     mode => 644,
 }->
-file {
-    '/vagrant/make-slurm.sh':
-    ensure => 'file',
-  #  path => $::hostname?{
-    path => '/vagrant/make-slurm.sh',
- #      'head' => '/vagrant/make-slurm.sh',
- #      default => '/vagrant/install-slurm.sh',
-#    },
-    owner => 'root',
-    group => 'root',
-    mode  => '0755',
-    notify => Exec['slurm_script'],
-}
 exec { 'slurm_script':
-    command => "/bin/bash -c '/vagrant/make-slurm.sh'",
+    command => "/bin/rpm -i --replacepkgs /vagrant/RPMS/*",
 }->
+file { '/etc/slurm/slurm.conf':
+    ensure => present,
+    source => 'file:///vagrant/slurm.conf',
+    owner => 'slurm',
+    group => 'slurm',
+    mode => 644,
+} ->
 service { 'slurm':
     ensure => 'running',
     enable => 'true',
-}/*->
-service { 'daemons':
-    name => $::hostname?{
-       'head' => 'slurmctld',
-       default =? 'slurmd',
-    },
-    ensure => 'running',
-    enable => 'true',
-}*/
+}
