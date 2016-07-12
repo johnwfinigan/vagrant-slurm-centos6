@@ -32,7 +32,7 @@ package { ['openssl-devel', 'zlib-devel', 'bzip2-devel', 'chrpath']:
 package { 'epel-release-6-8.noarch':
 	provider => 'rpm',
 	ensure => 'installed',
-	source => 'https://dl.fedoraproject.org/pub/epel/epel-release-6-8.noarch.rpm',
+	source => 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm',
 } ->
 package { ['munge', 'munge-devel', 'munge-libs']:
 	ensure => 'installed',
